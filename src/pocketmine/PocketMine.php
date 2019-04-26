@@ -197,7 +197,7 @@ namespace pocketmine {
 	//Logger has a dependency on timezone
 	$tzError = Timezone::init();
 
-	$logger = new MainLogger(\pocketmine\DATA . "server.log");
+	$logger = new MainLogger();
 	$logger->registerStatic();
 
 	foreach($tzError as $e){

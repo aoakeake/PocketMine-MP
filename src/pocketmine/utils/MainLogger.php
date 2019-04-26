@@ -56,8 +56,6 @@ use const PTHREADS_INHERIT_NONE;
 
 class MainLogger extends \AttachableThreadedLogger{
 
-	/** @var string */
-	protected $logFile;
 	/** @var \Threaded */
 	protected $logStream;
 	/** @var bool */
@@ -79,18 +77,15 @@ class MainLogger extends \AttachableThreadedLogger{
 	private $timezone;
 
 	/**
-	 * @param string $logFile
 	 * @param bool   $logDebug
 	 *
 	 * @throws \RuntimeException
 	 */
-	public function __construct(string $logFile, bool $logDebug = false){
+	public function __construct(bool $logDebug = false){
 		parent::__construct();
 		if(static::$logger instanceof MainLogger){
 			throw new \RuntimeException("MainLogger has been already created");
 		}
-		touch($logFile);
-		$this->logFile = $logFile;
 		$this->logDebug = $logDebug;
 		$this->logStream = new \Threaded;
 
@@ -347,20 +342,5 @@ class MainLogger extends \AttachableThreadedLogger{
 
 	public function run(){
 		$this->shutdown = false;
-		$logResource = fopen($this->logFile, "ab");
-		if(!is_resource($logResource)){
-			throw new \RuntimeException("Couldn't open log file");
-		}
-
-		while(!$this->shutdown){
-			$this->writeLogStream($logResource);
-			$this->synchronized(function(){
-				$this->wait(25000);
-			});
-		}
-
-		$this->writeLogStream($logResource);
-
-		fclose($logResource);
 	}
 }
